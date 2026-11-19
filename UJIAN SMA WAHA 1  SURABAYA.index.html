@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Ujian SMA</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+header {
+  background: #123b65;
+  color: white;
+  text-align: center;
+  padding: 24px;
+}
+
+header h1 { margin: 0 0 8px; }
+header p { margin: 0; }
+
+.container {
+  max-width: 850px;
+  margin: 35px auto;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px #0001;
+}
+
+h2 { color: #123b65; }
+
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 17px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+label { font-weight: bold; }
+
+button {
+  background: #123b65;
+  color: white;
+  border: 0;
+  padding: 13px 22px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button:hover { background: #1d568d; }
+
+.hidden { display: none !important; }
+
+.info {
+  background: #eff6ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  line-height: 1.8;
+}
+
+.question {
+  padding: 18px;
+  margin: 18px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+}
+
+.question h3 { margin-top: 0; }
+
+.notice {
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 12px;
+  border-radius: 7px;
+  margin-bottom: 15px;
+}
+
+#warning {
+  position: fixed;
+  top: 15px;
+  left: 5%;
+  width: 90%;
+  background: #1c3eb9;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  border-radius: 8px;
+  z-index: 99;
+  display: none;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #c1ca0d;
+  font-size: 13px;
+}
+/* BACKGROUND GEDUNG SEKOLAH */
+body {
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.45)
+        ),
+        url("image/background.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* ANIMASI HALAMAN UJIAN */
+@keyframes fadeMasuk {
+    0% {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efek pada kotak halaman */
+.page {
+    animation: fadeMasuk 1s ease-in-out;
+}
+
+/* Efek tombol */
+button {
+    transition: transform 0.3s ease,box-shadow 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.04);
+    box-shadow: 0 4px 12px rgba 0,00,0,2;
+}
+
+/* Efek kartu */
+.card {
+    transition: all 0.3s ease;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>PORTAL UJIAN SEKOLAH</h1>
+  <p>SMA WACHID HASYIM 1 SURABAYA</p>
+</header>
+
+<div id="warning">
+  PERINGATAN! Anda terdeteksi meninggalkan halaman ujian.
+  Silakan kembali ke halaman ujian.
+</div>
+
+<!-- HALAMAN LOGIN -->
+<div class="container" id="loginPage">
+  <h2>Login Peserta Ujian</h2>
+  <p>Silakan masukkan akun yang telah diberikan oleh guru.</p>
+
+  <label>Nomor Induk Siswa (NIS)</label>
+  <input type="text" id="username" placeholder="Masukkan NIS Anda">
+
+  <label>Password</label>
+  <input type="password" id="password" placeholder="Masukkan password">
+
+  <button onclick="login()">MASUK UJIAN</button>
+
+  <p id="loginError" style="color:rgb(232, 220, 57);"></p>
+</div>
+
+<!-- HALAMAN IDENTITAS -->
+<div class="container hidden" id="identityPage">
+  <h2>Identitas Peserta Ujian</h2>
+  <p>Lengkapi identitas sebelum mengerjakan soal.</p>
+
+  <label>Nama Lengkap</label>
+  <input id="studentName" type="text" placeholder="Nama lengkap siswa">
+
+  <label>Kelas</label>
+  <input id="studentClass" type="text" placeholder="Contoh: XII IPA 1">
+
+  <label>Mata Pelajaran</label>
+  <input id="subject" type="text" placeholder="Nama mata pelajaran">
+
+  <label>Nama Guru Pengampu</label>
+  <input id="teacher" type="text" placeholder="Nama guru">
+
+  <label>Tanggal Ujian</label>
+  <input id="examDate" type="date">
+
+  <button onclick="startExam()">MULAI MENGERJAKAN</button>
+</div>
+
+<!-- HALAMAN SOAL -->
+<div class="container hidden" id="examPage">
+  <h2>Lembar Pengerjaan Ujian</h2>
+
+  <div class="info" id="studentInfo"></div>
+
+  <div class="notice">
+    Perhatian: Kerjakan seluruh soal dengan teliti dan jangan lupa berdoa.
+    Jangan meninggalkan halaman ujian selama pengerjaan.
+  </div>
+
+  <form id="examForm">
+
+    <div class="question">
+      <h3>Soal Nomor 1</h3>
+      <p id="q1">Jelaskan pengertian dan konsep dasar materi yang telah dipelajari!</p>
+      <textarea id="a1" placeholder="Tuliskan jawaban Anda..." required></textarea>
+    </div>
+
+    <div class="question">
+      <h3>Soal Nomor 2</h3>
+      <p id="q2">Uraikan faktor-faktor yang memengaruhi materi tersebut!</p>
+      <textarea id="a2" placeholder="Tuliskan jawaban Anda..." required></textarea>
+    </div>
+
+    <div class="question">
+      <h3>Soal Nomor 3</h3>
+      <p id="q3">Jelaskan contoh penerapan materi tersebut dalam kehidupan sehari-hari!</p>
+      <textarea id="a3" placeholder="Tuliskan jawaban Anda..." required></textarea>
+    </div>
+
+    <div class="question">
+      <h3>Soal Nomor 4</h3>
+      <p id="q4">Analisis permasalahan yang berkaitan dengan materi yang telah dipelajari!</p>
+      <textarea id="a4" placeholder="Tuliskan jawaban Anda..." required></textarea>
+    </div>
+
+    <div class="question">
+      <h3>Soal Nomor 5</h3>
+      <p id="q5">Berikan kesimpulan berdasarkan pemahaman Anda terhadap materi tersebut!</p>
+      <textarea id="a5" placeholder="Tuliskan jawaban Anda..." required></textarea>
+    </div>
+
+    <button type="submit">KIRIM JAWABAN</button>
+  </form>
+
+  <p id="saveStatus" style="color:rgb(5, 86, 147);"></p>
+</div>
+
+<!-- HALAMAN SELESAI -->
+<div class="container hidden" id="finishPage">
+  <h2>Ujian Telah Selesai!</h2>
+  <p>Terima kasih. Jawaban Anda telah dikirim pada perangkat ini.</p>
+  <p id="finishInfo"></p>
+  <button onclick="downloadAnswers()">UNDUH BUKTI JAWABAN</button>
+</div>
+
+<footer>
+  Portal Ujian Sekolah | Sistem Ujian Online SMA WACHID HASYIM 1 SURABAYA 
+</footer>
+
+<script>
+
+// AKUN LOGIN DEMO
+// Silakan ubah username dan password sesuai kebutuhan.
+const USERNAME = "admin";
+const PASSWORD = "waha1";
+
+let student = {};
+let tabWarnings = 0;
+let submittedData = null;
+
+// LOGIN
+// PASSWORD SEKOLAH
+const PASSWORD_SEKOLAH = "UJIAN2026";
+
+// DAFTAR NIS SISWA
+const daftarNIS = [
+    "202312120556",
+    "202312120555",
+    "202312120554",
+    "202312120553",
+    "202312120552"
+];
+
+// LOGIN SISWA
+function login() {
+    let nis = document.getElementById("username").value.trim();
+    let pass = document.getElementById("password").value;
+
+    if (!daftarNIS.includes(nis)) {
+        document.getElementById("loginError").innerText =
+            "NIS tidak terdaftar!";
+        return;
+    }
+
+    if (pass !== PASSWORD_SEKOLAH) {
+        document.getElementById("loginError").innerText =
+            "Password sekolah salah!";
+        return;
+    }
+
+    document.getElementById("loginError").innerText = "";
+
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("identityPage").classList.remove("hidden");
+
+    document.getElementById("examDate").value =
+        new Date().toLocaleDateString("en-CA");
+}
+
+// MULAI UJIAN
+async function startExam() {
+  const name = document.getElementById("studentName").value.trim();
+  const kelas = document.getElementById("studentClass").value.trim();
+  const subject = document.getElementById("subject").value.trim();
+  const teacher = document.getElementById("teacher").value.trim();
+  const date = document.getElementById("examDate").value;
+
+  if (!name || !kelas || !subject || !teacher || !date) {
+    showNotification("Semua identitas harus diisi!");
+    return;
+  }
+
+  student = { name, kelas, subject, teacher, date };
+
+  document.getElementById("studentInfo").innerHTML = `
+    <b>Nama:</b> ${escapeHTML(name)}<br>
+    <b>Kelas:</b> ${escapeHTML(kelas)}<br>
+    <b>Mata Pelajaran:</b> ${escapeHTML(subject)}<br>
+    <b>Guru:</b> ${escapeHTML(teacher)}<br>
+    <b>Tanggal:</b> ${escapeHTML(date)}
+  `;
+
+  document.getElementById("identityPage").classList.add("hidden");
+  document.getElementById("examPage").classList.remove("hidden");
+
+  // Meminta layar penuh
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (e) {
+    alert("Mode layar penuh tidak tersedia. Silakan lanjutkan ujian.");
+  }
+
+  // Pulihkan jawaban sementara jika tersedia
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById("a" + i).value =
+      localStorage.getItem("jawaban" + i) || "";
+  }
+}
+
+// SIMPAN JAWABAN OTOMATIS
+for (let i = 1; i <= 5; i++) {
+  document.getElementById("a" + i).addEventListener("input", function() {
+    localStorage.setItem("jawaban" + i, this.value);
+    document.getElementById("saveStatus").innerText =
+      "Jawaban tersimpan sementara.";
+  });
+}
+
+// DETEKSI PINDAH TAB
+document.addEventListener("visibilitychange", function() {
+  if (!document.getElementById("examPage").classList.contains("hidden")
+      && document.visibilityState === "hidden") {
+    tabWarnings++;
+    document.getElementById("warning").style.display = "block";
+    document.getElementById("warning").innerText =
+      "PERINGATAN! Anda meninggalkan halaman ujian. Peringatan ke-" +
+      tabWarnings;
+  }
+});
+
+// KEMBALI KE TAB
+window.addEventListener("focus", function() {
+  document.getElementById("warning").style.display = "none";
+});
+
+// DETEKSI KELUAR FULLSCREEN
+document.addEventListener("fullscreenchange", function() {
+  if (!document.fullscreenElement &&
+      !document.getElementById("examPage").classList.contains("hidden")) {
+    document.getElementById("warning").style.display = "block";
+    document.getElementById("warning").innerText =
+      "PERINGATAN! Anda keluar dari mode layar penuh.";
+  }
+});
+
+// MENCEGAH COPY, PASTE DAN KLIK KANAN
+document.addEventListener("contextmenu", e => {
+  if (!document.getElementById("examPage").classList.contains("hidden"))
+    e.preventDefault();
+});
+
+document.addEventListener("copy", e => {
+  if (!document.getElementById("examPage").classList.contains("hidden"))
+    e.preventDefault();
+});
+
+document.addEventListener("paste", e => {
+  if (!document.getElementById("examPage").classList.contains("hidden"))
+    e.preventDefault();
+});
+
+// KIRIM JAWABAN
+document.getElementById("examForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  if (!confirm("Apakah Anda yakin ingin mengirim seluruh jawaban?")) {
+    return;
+  }
+
+  const answers = {};
+  for (let i = 1; i <= 5; i++) {
+    answers["Soal " + i] = document.getElementById("a" + i).value;
+  }
+
+  submittedData = {
+    identitas: student,
+    jawaban: answers,
+    jumlahPeringatan: tabWarnings,
+    waktuKirim: new Date().toLocaleString("id-ID")
+  };
+
+  // Simpan pada perangkat
+  localStorage.setItem("hasilUjian", JSON.stringify(submittedData));
+
+  document.getElementById("examPage").classList.add("hidden");
+  document.getElementById("finishPage").classList.remove("hidden");
+
+  document.getElementById("finishInfo").innerText =
+    "Nama: " + student.name +
+    " | Kelas: " + student.kelas;
+
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+
+  for (let i = 1; i <= 5; i++) {
+    localStorage.removeItem("jawaban" + i);
+  }
+});
+
+// UNDUH HASIL JAWABAN
+function downloadAnswers() {
+  if (!submittedData) {
+    alert("Data jawaban tidak ditemukan.");
+    return;
+  }
+
+  let content = "HASIL UJIAN SEKOLAH\n\n";
+  content += "Nama: " + submittedData.identitas.name + "\n";
+  content += "Kelas: " + submittedData.identitas.kelas + "\n";
+  content += "Mata Pelajaran: " + submittedData.identitas.subject + "\n";
+  content += "Guru: " + submittedData.identitas.teacher + "\n";
+  content += "Tanggal: " + submittedData.identitas.date + "\n\n";
+
+  for (const [question, answer] of Object.entries(submittedData.jawaban)) {
+    content += question + "\n" + answer + "\n\n";
+  }
+
+  content += "Peringatan perpindahan tab: " +
+    submittedData.jumlahPeringatan + "\n";
+  content += "Waktu pengiriman: " + submittedData.waktuKirim;
+
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+
+  a.href = url;
+  a.download = "Jawaban_" +
+    submittedData.identitas.name.replace(/[^a-z0-9]/gi, "_") + ".txt";
+
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// MENCEGAH HTML INJECTION PADA IDENTITAS
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, function(char) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char];
+  });
+}
+function showNotification(message) {
+    let notif = document.getElementById("customNotif");
+
+    if (!notif) {
+        notif = document.createElement("div");
+        notif.id = "customNotif";
+        notif.style.cssText = `
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: white;
+            color: #222;
+            padding: 20px 25px;
+            border-left: 5px solid #c62828;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px #0003;
+            z-index: 99999;
+            font-weight: bold;
+        `;
+        document.body.appendChild(notif);
+    }
+
+    notif.textContent = "⚠️ PERINGATAN!" + message;
+
+    setTimeout(() => {
+        notif.remove();
+    }, 3500);
+}
+</script>
+
+</body>
+</html>
